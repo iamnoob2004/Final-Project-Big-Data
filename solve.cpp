@@ -28,24 +28,6 @@ void sort_all(){
         cout << '\n';
     }
 }
-/*
-double f(int x){
-    return log(x+4);
-}
-
-double f_inv(double x){
-    return exp(x)-4;
-}
-
-double dis(int x, int y){
-    double res=0;
-    for(int i=1; i<m; ++i){
-        double u=f(a[x][i]),v=f(a[y][i]);
-        res+=pow(abs(u-v),2);
-    }
-    return sqrt(res);
-}
-*/
 
 vector<double> tot[K];
 int cnt[K];
@@ -73,7 +55,10 @@ void k_means_cluster(vector<int> ids, int start, int groups){
             double bst=1e18;
             for(int j=start; j<start+groups; ++j){
                 double de=0;
-                for(int r=0; r<m-1; ++r) de+=pow(abs(a[i].second[r]-tot[j][r]),2);
+                for(int r=0; r<m-1; ++r){
+                    //if(r!=0&&r!=1) continue;
+                    de+=pow(abs(a[i].second[r]-tot[j][r]),2);
+                }
                 de=sqrt(de);
                 // de+=cnt[j]/200000.0;
                 if(id==-1||de<bst){
@@ -88,24 +73,7 @@ void k_means_cluster(vector<int> ids, int start, int groups){
         cerr << it << ' ' << change << "\n";
         if(change==0) break;
     }
-    /*
-    for(int i=0; i<k; ++i){
-        cerr << "group " << i << ' ' << cnt[i] << ' ';
-        for(int j=1; j<m; ++j) cerr << tot[i][j] << ' ';
-        cerr << '\n';
-    }
-    cout << n << ' ' << m-1 << "\n";
-    for(int j=0; j<k; ++j){
-        for(int i=0; i<n; ++i) if(gr[i]==j){
-            cout << a[i][0] << ' ' << gr[i] << ' ';
-            for(int r=1; r<m; ++r) cout << a[i][r] << ' ';
-            cout << '\n';
-        }
-    }
-    */
 }
-
-//double mu[K],sigma[K];
 
 signed main(){
     ios_base::sync_with_stdio(0),cin.tie(0);
@@ -116,6 +84,18 @@ signed main(){
         cin >> a[i].first;
         for(int j=0; j<m-1; ++j) cin >> a[i].second[j];
     }
+    /*
+    map<int,int> mp;
+    for(int i=0; i<n; ++i){
+        int msk=0;
+        for(int j=0; j<m-1; ++j) if(a[i].second[j]>0.01){
+            msk|=1<<j;
+        }
+        mp[msk]++;
+    }
+    for(auto [msk,val]: mp) cout << msk << ' ' << val << "\n";
+    return 0;
+    */
     vector<int> vec1,vec2,vec3;
     for(int i=0; i<n; ++i){
         /*
@@ -130,7 +110,7 @@ signed main(){
     //k_means_cluster(vec1,0,5);
     //k_means_cluster(vec2,5,5);
     //k_means_cluster(vec3,10,5);
-    k_means_cluster(vec1,0,15);
+    k_means_cluster(vec1,0,k);
     for(int i=0; i<k; ++i){
         cerr << "group " << i << ' ' << cnt[i] << ' ';
         for(int j=0; j<m-1; ++j) cerr << tot[i][j] << ' ';
@@ -144,99 +124,4 @@ signed main(){
             cout << '\n';
         }
     }
-    /*
-    for(int j=0; j<m-1; ++j){
-        for(int i=0; i<n; ++i){
-            mu[j]+=a[i].second[j];
-        }
-        mu[j]/=n;
-    }
-    for(int j=0; j<m-1; ++j){
-        for(int i=0; i<n; ++i){
-            sigma[j]+=pow(a[i].second[j]-mu[j],2);
-        }
-        sigma[j]/=n;
-        sigma[j]=sqrt(sigma[j]);
-    }
-    for(int j=0; j<m-1; ++j){
-        for(int j2=0; j2<m-1; ++j2){
-            double cov=0;
-            for(int i=0; i<n; ++i) cov+=1ll*a[i].second[j]*a[i].second[j2];
-            cov/=n;
-            cov-=mu[j]*mu[j2];
-            cout << cov/(sigma[j]*sigma[j2]) << ' ';
-        }
-        cout << "\n";
-    }
-    */
-    /*
-    const int M=100;
-    int cnt[4][M+1]{};
-    for(int i=0; i<n; ++i){
-        int id=max_element(a[i].second.begin()+1,a[i].second.end())-a[i].second.begin();
-        if(a[i].second[0]<0.01){
-            cnt[id][int(a[i].second[id]*M)]++;
-        }
-    }
-    for(int i=0; i<M; ++i) if(max({cnt[1][i],cnt[2][i],cnt[3][i]})>0){
-        cout << i << ' ';
-        for(int x=1; x<4; ++x) cout << cnt[x][i] << ' ';
-        cout << '\n';
-    }
-    
-    const int M=30;
-    int cnt[M+1][M+1]{};
-    int tot=0;
-    for(int i=0; i<n; ++i){
-        if(a[i].second[0]<0.01){
-            if(a[i].second[1]<0.25&&a[i].second[3]<0.25) tot++;
-            if(a[i].second[3]>max(a[i].second[1],a[i].second[2])){
-                cnt[int(a[i].second[1]*M)][int(a[i].second[2]*M)]++,tot++;
-            }
-        }
-    }
-    cout << tot << "\n";
-    */
-    /*
-    cout << tot << "\n";
-    for(int i=0; i<M; ++i){
-        for(int j=0; j<M; ++j) cout << setw(4) << cnt[i][j] << ' ';
-        cout << '\n';
-    }
-    */
-    /*
-    k=4*(m-1)-1;
-    for(int i=0; i<n; ++i){
-        b[i].resize(m);
-        b[i][0]=a[i][0];
-        
-        double tot=0;
-        for(int j=1; j<m; ++j){
-            tot+=a[i][j]*a[i][j];
-        }
-        tot=sqrt(tot);
-        for(int j=1; j<m; ++j){
-            b[i][j]=a[i][j]/tot;
-        }
-        
-        for(int j=1; j<m; ++j){
-            b[i][j]=f(a[i][j]);
-        }
-    }
-    */
-    // k_means_cluster();
-
-    /*
-    map<vector<int>,int> mp;
-    for(int i=0; i<n; ++i){
-        vector<int> ord(m-1);
-        iota(all(ord),0);
-        sort(all(ord),[&](int x, int y){return a[i][x+1]<a[i][y+1];});
-        mp[ord]++;
-    }
-    for(auto &[v,y]: mp){
-        for(int i=0; i<sz(v); ++i) cout << v[i] << ' ';
-        cout << y << "\n";
-    }
-    */
 }
